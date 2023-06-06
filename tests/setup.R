@@ -1,12 +1,13 @@
-# 
-# 
-# 
+# housing code dogma
+# even satan ceased sweat since
+# eighth sin: central air
+library(haven)
+
 sas_tf <- tempfile()
 
 sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip"
 
 download.file( sas_url , sas_tf , mode = 'wb' )
-library(haven)
 
 recs_tbl <- read_sas( sas_tf )
 
@@ -144,24 +145,23 @@ recs_v1_df <- data.frame( recs_v1_tbl )
 names( recs_v1_df ) <- tolower( names( recs_v1_df ) )
 
 recs_v1_design <-
- svrepdesign(
- data = recs_v1_df ,
- weight = ~ nweight ,
- repweights = 'nweight[1-9]+' ,
- type = 'JK1' ,
- combined.weights = TRUE ,
- scale = 59 / 60 ,
- mse = TRUE
- )
-	
+	svrepdesign(
+		data = recs_v1_df ,
+		weight = ~ nweight ,
+		repweights = 'nweight[1-9]+' ,
+		type = 'JK1' ,
+		combined.weights = TRUE ,
+		scale = 59 / 60 ,
+		mse = TRUE
+	)
+
 recs_v1_design <- 
-	
 	update( 
-		
+
 		recs_v1_design , 
-		
+
 		natural_gas_mainspace_heat = as.numeric( fuelheat == 1 )
-			
+		
 	)
 	
 result <-
