@@ -52,6 +52,23 @@ recs_design <-
 						'Other' 
 					)
 			) ,
+
+		rooftype =
+			factor(
+				rooftype ,
+				levels = c( -2 , 1:6 , 99 ) ,
+				labels =
+					c(
+						'Not applicable' ,
+						'Ceramic or clay tiles' ,
+						'Wood shingles/shakes' ,
+						'Metal' ,
+						'Slate or synthetic slate' ,
+						'Shingles (composition or asphalt)' ,
+						'Concrete tiles' ,
+						'Other'
+					)
+			) ,
 			
 		swimpool_binary =
 			ifelse( swimpool %in% 0:1 , swimpool , NA )
@@ -66,15 +83,15 @@ svyby( ~ one , ~ main_heating_fuel , recs_design , svytotal )
 svymean( ~ totsqft_en , recs_design )
 
 svyby( ~ totsqft_en , ~ main_heating_fuel , recs_design , svymean )
-svymean( ~ state_name , recs_design )
+svymean( ~ rooftype , recs_design )
 
-svyby( ~ state_name , ~ main_heating_fuel , recs_design , svymean )
+svyby( ~ rooftype , ~ main_heating_fuel , recs_design , svymean )
 svytotal( ~ totsqft_en , recs_design )
 
 svyby( ~ totsqft_en , ~ main_heating_fuel , recs_design , svytotal )
-svytotal( ~ state_name , recs_design )
+svytotal( ~ rooftype , recs_design )
 
-svyby( ~ state_name , ~ main_heating_fuel , recs_design , svytotal )
+svyby( ~ rooftype , ~ main_heating_fuel , recs_design , svytotal )
 svyquantile( ~ totsqft_en , recs_design , 0.5 )
 
 svyby( 
@@ -122,12 +139,12 @@ svyciprop( ~ swimpool_binary , recs_design ,
 	method = "likelihood" , na.rm = TRUE )
 svyttest( totsqft_en ~ swimpool_binary , recs_design )
 svychisq( 
-	~ swimpool_binary + state_name , 
+	~ swimpool_binary + rooftype , 
 	recs_design 
 )
 glm_result <- 
 	svyglm( 
-		totsqft_en ~ swimpool_binary + state_name , 
+		totsqft_en ~ swimpool_binary + rooftype , 
 		recs_design 
 	)
 
