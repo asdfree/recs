@@ -5,7 +5,7 @@ library(haven)
 
 sas_tf <- tempfile()
 
-sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v2.zip"
+sas_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v3.zip"
 
 download.file( sas_url , sas_tf , mode = 'wb' )
 
@@ -149,33 +149,11 @@ glm_result <-
 	)
 
 summary( glm_result )
-sas_v1_tf <- tempfile()
 
-sas_v1_url <- "https://www.eia.gov/consumption/residential/data/2020/sas/recs2020_public_v1.zip"
-
-download.file( sas_v1_url , sas_v1_tf , mode = 'wb' )
-
-recs_v1_tbl <- read_sas( sas_v1_tf )
-
-recs_v1_df <- data.frame( recs_v1_tbl )
-
-names( recs_v1_df ) <- tolower( names( recs_v1_df ) )
-
-recs_v1_design <-
-	svrepdesign(
-		data = recs_v1_df ,
-		weight = ~ nweight ,
-		repweights = 'nweight[1-9]+' ,
-		type = 'JK1' ,
-		combined.weights = TRUE ,
-		scale = 59 / 60 ,
-		mse = TRUE
-	)
-
-recs_v1_design <- 
+recs_design <- 
 	update( 
 
-		recs_v1_design , 
+		recs_design , 
 
 		natural_gas_mainspace_heat = as.numeric( fuelheat == 1 )
 		
@@ -184,12 +162,12 @@ recs_v1_design <-
 result <-
 	svytotal( 
 		~ natural_gas_mainspace_heat , 
-		recs_v1_design 
+		recs_design 
 	)
 
-stopifnot( round( coef( result ) , 0 ) == 56245389 )
-stopifnot( round( SE( result ) , 0 ) == 545591 )
-stopifnot( round( 100 * SE( result ) / coef( result ) , 2 ) == 0.97 )
+stopifnot( round( coef( result ) , 0 ) == 62713449 )
+stopifnot( round( SE( result ) , 0 ) == 483047 )
+stopifnot( round( 100 * SE( result ) / coef( result ) , 2 ) == 0.77 )
 library(srvyr)
 recs_srvyr_design <- as_survey( recs_design )
 recs_srvyr_design %>%
